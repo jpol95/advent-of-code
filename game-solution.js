@@ -30,7 +30,6 @@
 
 // console.log(accCount())
 
-
 /* 
 ------------------------------------------------PART TWO OF THE PROBLEM ----------------------------------------------------
 */
@@ -43,50 +42,74 @@ const setUp = (command) => {
 };
 
 const accCount = () => {
-  const commandArray = commands.split(/\n/).map(setUp);
-  return findProblem(0, commandArray);
+  let commandArray = commands.split(/\n/).map(setUp);
+  const instructions = [];
+  getTouched(0, commandArray, instructions);
+  let bug = -1;
+  for (let instruction of instructions) {
+    //   console.log(instruction)
+    commandArray = commands.split(/\n/).map(setUp);
+    if (doesComplete(0, commandArray, instruction)) bug = instruction;
+  }
+  console.log(bug);
+  //   return doesComplete(0, commandArray, -1);
 };
 
-const switchOp = (command) => {
-    if (Object.keys(command)[0] === "jpm"){
-        return {"nop": command["jmp"], touched: true};
-    }
-    if (Object.keys(command[0]) === "nop"){
-        return {"jmp": command["nop"], touched: true};
-    }
-    return command;
-}
-
-const findProblem = (index, commandArray, indexToSwitch) => {
-  let problem = -1;
-  if (indexToSwitch === index) {
-      commandArray[index] = switchOp(commandArray[index])
-  }
+const getTouched = (index, commandArray, output) => {
   const commandObj = commandArray[index];
+  output.push(index);
+  if (commandObj.touched === true) return;
   commandObj.touched = true;
   const command = Object.keys(commandObj)[0];
   if (command === "nop") {
-    if (commandArray[index + 1].touched){
-        return index
-   }
-    problem = findProblem(index + 1, commandArray);
+    getTouched(index + 1, commandArray, output);
   }
   if (command === "jmp") {
-    if (commandArray[index + commandObj[command]].touched){
-        return index 
-    }
-    problem = findProblem(index + commandObj[command], commandArray);
+    getTouched(index + commandObj[command], commandArray, output);
   }
   if (command === "acc") {
-    if (commandArray[index + 1].touched){
-         return index 
-    }
-    problem = findProblem(index + 1, commandArray);
+    getTouched(index + 1, commandArray, output);
   }
-  return problem;
+  return;
 };
 
-console.log(accCount())
+const switchOp = (command) => {
+  if (Object.keys(command)[0] === "jmp") {
+    return { nop: command["jmp"], touched: command.touched };
+  }
+  if (Object.keys(command)[0] === "nop") {
+    // console.log({ jmp: command["nop"], touched: true })
+    return { jmp: command["nop"], touched: command.touched };
+  }
+  return command;
+};
+
+const doesComplete = (index, commandArray, indexToSwitch) => {
+  let completed = false;
+  if (indexToSwitch === index) {
+    commandArray[index] = switchOp(commandArray[index]);
+  }
+  const commandObj = commandArray[index];
+  if (index >= commandArray.length) return true;
+  if (commandObj.touched === true) return false;
+  commandObj.touched = true;
+  const command = Object.keys(commandObj)[0];
+  if (command === "nop") {
+    completed = doesComplete(index + 1, commandArray, indexToSwitch);
+  }
+  if (command === "jmp") {
+    completed = doesComplete(
+      index + commandObj[command],
+      commandArray,
+      indexToSwitch
+    );
+  }
+  if (command === "acc") {
+    completed = doesComplete(index + 1, commandArray, indexToSwitch);
+  }
+  return completed;
+};
+
+console.log(accCount());
 
 //you should fix the logic here!!!!!
-
