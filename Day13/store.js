@@ -5,4 +5,4 @@ const busesShort1 = `939,7,13,x,x,59,x,31,19`
 const busesShort2 = `-1,17,x,13,19`
 const busesShort3 = `-1,1789,37,47,1889`
 
-module.exports = busesShort1;
+module.exports = busesShort2;
