@@ -26,17 +26,13 @@ let busObject = {}
   while (indexToCheck >= 0) {
       const bus = busKeys[indexToCheck];
       const checking = myTime + busObject[bus] - busObject[max]
-      if (myTime >= 2000){
-          console.log("dbugger")
-      }
       if ((myTime + busObject[bus] - busObject[max]) % (Number(bus)) === 0) {
-        console.log(indexToCheck)
         indexToCheck --;
         incrementer *= Number(bus)
     }
     myTime += (incrementer)
   }
-  return myTime - max - busObject[max];
+  return myTime - incrementer - busObject[max];
 };
 
 console.log(firstBus());
