@@ -13,7 +13,8 @@ const sumMemory = () => {
             let memoryAddresses = parseMask(mask, convertToBinary(Number(command.slice(4).split("]")[0])))
             memoryAddresses = processMemories(memoryAddresses)
             for (let memoryAddress of memoryAddresses){
-            memory = {...memory, [memoryAddress]: insertionVal}
+            // console.log(memoryAddresses)
+            memory[memoryAddress]= insertionVal
             }
         }
     }
@@ -39,7 +40,7 @@ const convertToBinary = (decimal) => {
 
 const convertToBinaryShort = (decimal, numDigits) => {
     let binaryString = "";
-    for (let i = numDigits; i >=0; i--){
+    for (let i = numDigits - 1; i >= 0; i--){
         if (decimal >= Math.pow(2, i)){
             binaryString += "1";
             decimal -=  Math.pow(2, i)
@@ -61,9 +62,11 @@ const processMemories = (mask) => {
             count++;
         }
     }
-    console.log(Math.pow(2, count))
-    for (let i = 0; i < Math.pow(2, count); i++){
+    // console.log(Math.pow(2, count))
+    const limit = Math.pow(2, count)
+    for (let i = 0; i < limit; i++){
         let binString = convertToBinaryShort(i, count).split('')
+        // console.log(binString)
         const maskArray = mask.split('')
         for (let j = 0; j < indexes.length; j++){
             maskArray[indexes[j]] = binString[j]
