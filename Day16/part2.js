@@ -3,6 +3,7 @@ const ticketInfo = require("./store");
 const findDepartures = () => {
   let [rules, myTicket, otherTickets] = ticketInfo.split(/\n\n/);
   rules = parseRules(rules);
+  myTicket = myTicket.split(/\n/).slice(1)[0].split(",").map(Number);
   otherTickets = otherTickets
     .split(/\n/)
     .slice(1)
@@ -17,26 +18,56 @@ const findDepartures = () => {
     }
     return true;
   });
-  findDesignations(validTickets, rules);
+  const designations = findDesignations(validTickets, rules);
+  return departureMultiplier(designations, myTicket)
+};
+
+const departureMultiplier = (designations, myTicket) => {
+    let result = 1;
+    const designationKeys = Object.keys(designations).filter(key => key.startsWith("departure"))
+    // console.log(myTicket)
+    for (let key of designationKeys){
+        // console.log(myTicket[designations[key]])
+        result *= myTicket[designations[key]];
+    }
+    return result;
 };
 
 const findDesignations = (ticketRows, rules) => {
-    const designations = {}
-    const rowLength = []
-    for (let i = 0; i < ticketRows[0].length; i++) rowLength.push(i)
-    for (let rule in rules){
-        designations[rule] = [...rowLength]
-    }
-    for (let ticketRow of ticketRows){
-        for (let i = 0; i < ticketRow.length; i ++){
-            for (let rule in rules){
-                if (!rules[rule].includes(ticketRow[i])) designations[rule][i] = null
-            }
+  let designations = [];
+  let designationsResult = {};
+  for (let i = 0; i < ticketRows[0].length; i++) {
+    designations[i] = [...Object.keys(rules)];
+  }
+  for (let ticketRow of ticketRows) {
+    for (let i = 0; i < ticketRow.length; i++) {
+      for (let rule in rules) {
+        if (!rules[rule].includes(ticketRow[i])) {
+          designations[i] = designations[i].filter(
+            (ruleInList) => rule !== ruleInList
+          );
         }
+      }
     }
-    console.log(designations)
-    return designations;
-}
+  }
+  for (let i = 0; i < designations.length; i++) {
+    let singleIndex = designations.findIndex(
+      (designation) => designation.length === 1
+    );
+    let singleRule = designations[singleIndex][0];
+    designationsResult[singleRule] = singleIndex;
+    for (let j = 0; j < designations.length; j++) {
+      if (designations[j].length !== 1) {
+        let indexToRemove = designations[j].indexOf(singleRule);
+        designations[j].splice(indexToRemove, 1);
+      }
+    }
+    designations[singleIndex] = [];
+  }
+//   console.log(designationsResult);
+
+  return designationsResult;
+};
 
 const parseRules = (ruleString) => {
   ruleString = ruleString.split(/\n/);
