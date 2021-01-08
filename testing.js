@@ -4,22 +4,10 @@ const jesse = "I like bags and I like the bag"
 
 const bigFunc = () => {
     let index = 0
-    const testArray = {}
-    for (let i = 0; i < 30000000; i++){
-        if (index % 2 === 0){
-        testArray[i] = i
-        index += testArray[i]
-        index += testArray[i]
-        index += testArray[i]
-        }
-    else {
-        testArray[i] = i
-        index += testArray[i]
-        index += testArray[i]
-        index += testArray[i]
-    }
-    }
-return index
+    const testArray = []
+    testArray[19] = 'a'
+    
+return  testArray[19]
 }
 
 console.log(bigFunc())
